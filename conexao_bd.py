@@ -1,16 +1,6 @@
 from psycopg2 import connect
 from psycopg2 import Error as ErrorPostgres
 
-class Log:
-    @staticmethod
-    def register_as_sucess(operacao):
-        pass
-
-    @staticmethod
-    def register_as_fail(operacao):
-        pass
-
-
 class Conexao:
     def open_con(self):
         self.conexao = connect(host='db-sanderson.cmvjpmpr40an.us-east-1.rds.amazonaws.com',
@@ -44,10 +34,10 @@ class Usuario:
         cs = self.con.cursor()
         try:
             cs.execute(f"INSERT INTO projeto_twitter.usuario (username, senha, email) VALUES ('{username}', '{senha}',  ARRAY['{email}']);")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -58,10 +48,10 @@ class Usuario:
         cs = self.con.cursor()
         try:
             cs.execute(f"UPDATE projeto_twitter.usuario SET email = ARRAY_APPEND(email, '{new_email}') WHERE username='{username}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -72,10 +62,10 @@ class Usuario:
         cs = self.con.cursor()
         try:
             cs.execute(f"UPDATE projeto_twitter.usuario SET nome = '{nome}', sobrenome = '{sobrenome}' WHERE username='{username}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -86,10 +76,10 @@ class Usuario:
         cs = self.con.cursor()
         try:
             cs.execute(f"UPDATE projeto_twitter.usuario SET data_nascimento = '{ano}-{mes}-{dia}' WHERE username='{username}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -100,10 +90,10 @@ class Usuario:
         cs = self.con.cursor()
         try:
             cs.execute(f"DELETE FROM projeto_twitter.usuario WHERE username = '{username}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -117,7 +107,7 @@ class Usuario:
                 return cs.fetchone()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -127,7 +117,7 @@ class Usuario:
                 return cs.fetchall()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -142,10 +132,10 @@ class Conteudo:
         cs = self.con.cursor()
         try:
             cs.execute(f"INSERT INTO projeto_twitter.conteudo (value_conteudo, tipo, username_possuidor) VALUES ('{value}', '0', '{username}');")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -158,11 +148,11 @@ class Conteudo:
             id_imagem = Imagem(cs).new_imagem(caminho_imagem)
             print(id_imagem)
             cs.execute(f"INSERT INTO projeto_twitter.conteudo (username_possuidor, value_conteudo, tipo, id_imagem_conteudo) VALUES ('{username}','{value}', '0', {id_imagem});")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             self.con.rollback()
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         else:
             self.con.commit()
         finally:
@@ -177,11 +167,11 @@ class Conteudo:
             cs.execute(f"UPDATE projeto_twitter.conteudo SET n_curtidas = n_curtidas + 1 WHERE id_conteudo = {id_conteudo};")
             Curtida(cs).add_curtida(username, id_conteudo)
             self.con.commit()
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             self.con.rollback()
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -194,11 +184,11 @@ class Conteudo:
             cs.execute(f"UPDATE projeto_twitter.conteudo SET n_curtidas = n_curtidas - 1 WHERE id_conteudo = {id_conteudo};")
             Curtida(cs).delete_curtida(username, id_conteudo)
             self.con.commit()
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             self.con.rollback()
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
             
         finally:
             cs.close()
@@ -210,10 +200,10 @@ class Conteudo:
         cs = self.con.cursor()
         try:
             cs.execute(f"DELETE FROM projeto_twitter.conteudo WHERE id_conteudo = '{id_conteudo}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -228,11 +218,11 @@ class Conteudo:
             Imagem(cs).delete_imagem(id_imagem)
             cs.execute(f"DELETE FROM projeto_twitter.conteudo WHERE id_conteudo = {id_conteudo};")
             self.con.commit()
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             self.con.rollback()
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -247,7 +237,7 @@ class Conteudo:
                 return cs.fetchall()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -260,7 +250,7 @@ class Conteudo:
                 return cs.fetchall()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -391,10 +381,10 @@ class Tag:
         cs = self.con.cursor()
         try:
             cs.execute(f"INSERT INTO projeto_twitter.tag VALUES ('{value_tag}');")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -405,10 +395,10 @@ class Tag:
         cs = self.con.cursor()
         try:
             cs.execute(f"UPDATE projeto_twitter.tag SET topico_tag = '{new_topico}' WHERE tag = '{tag}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -419,10 +409,10 @@ class Tag:
         cs = self.con.cursor()
         try:
             cs.execute(f"UPDATE projeto_twitter.tag SET trending_tag = {is_trending} WHERE tag = '{tag}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
@@ -437,7 +427,7 @@ class Tag:
                 return cs.fetchone()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -450,7 +440,7 @@ class Tag:
                 return cs.fetchall()
             except (Exception, ErrorPostgres) as e:
                 print(f'Erro: {e}')
-                return 'erro no banco de dados'
+                return 500
             finally:
                 cs.close()
                 self.con.close_con()
@@ -461,10 +451,10 @@ class Tag:
         cs = self.con.cursor()
         try:
             cs.execute(f"DELETE FROM projeto_twitter.tag WHERE tag = '{tag}';")
-            return 'ok'
+            return 200
         except (Exception, ErrorPostgres) as e:
             print(f'Erro: {e}')
-            return 'erro no banco de dados'
+            return 500
         finally:
             cs.close()
             self.con.close_con()
