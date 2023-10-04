@@ -458,3 +458,63 @@ class Tag:
         finally:
             cs.close()
             self.con.close_con()
+
+class ConteudoTemTag:
+    def __init__(self):
+        self.con = Conexao()
+    
+    def new_conteudo_tem_tag(self, id_conteudo_tag, tag_associada):
+        self.con.open_con()
+        self.con.enable_autocommit()
+        cs = self.con.cursor()
+        try:
+            cs.execute(f"INSERT INTO projeto_twitter.conteudo_tem_tag VALUES ({id_conteudo_tag}, '{tag_associada}');")
+            return 200
+        except(Exception, ErrorPostgres) as e:
+            print(f'Erro: {e}')
+            return 500
+        finally:
+            cs.close()
+            self.con.close_con()
+    
+    def alter_conteudo_tem_tag(self, new_id_conteudo_tag, new_tag_associada):
+        self.con.open_con()
+        self.con.enable_autocommit()
+        cs = self.con.cursor()
+        try:
+            cs.execute(f"UPDATE projeto_twitter.conteudo_tem_tag SET (id_conteudo_tag, tag_associada) = ({new_id_conteudo_tag}, '{new_tag_associada}');")
+            return 200
+        except(Exception, ErrorPostgres) as e:
+            print(f'Erro: {e}')
+            return 500
+        finally:
+            cs.close()
+            self.con.close_con()
+
+    def get_conteudo_tem_tag(self):
+        self.con.open_con()
+        self.con.enable_autocommit()
+        cs = self.con.cursor()
+        try:
+            cs.execute(f"SELECT * FROM projeto_twitter.conteudo_tem_tag;")
+            return cs.fetchall()
+        except(Exception, ErrorPostgres) as e:
+            print(f'Erro: {e}')
+            return 500
+        finally:
+            cs.close()
+            self.con.close_con()
+
+    def delete_conteudo_tem_tag(self, id_conteudo_tag, tag_associada):
+        self.con.open_con()
+        self.con.enable_autocommit()
+        cs = self.con.cursor()
+        try:
+            cs.execute(f"DELETE FROM projeto_twitter.conteudo_tem_tag WHERE (id_conteudo_tag, tag_associada) = ({id_conteudo_tag}, '{tag_associada}')")
+            return 200
+        except(Exception, ErrorPostgres) as e:
+            print(f'Erro: {e}')
+            return 500
+        finally:
+            cs.close()
+            self.con.close_con()

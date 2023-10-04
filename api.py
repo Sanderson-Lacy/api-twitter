@@ -243,6 +243,53 @@ def tag_delete():
         return jsonify({'status': 'ok'}), 200
     else:
         return jsonify({'status': 'erro'}), 500
+    
+@app.route('/contentag/post', methods=['POST'])
+def post_conteudo_tem_tag():
+    data = request.get_json()
+    if 'id_conteudo_tag' not in data.keys() or 'tag_associada' not in data.keys():
+        return jsonify({"erro": "campos obrigatórios não informados"}), 400
+    r = ConteudoTemTag().new_conteudo_tem_tag(data["id_conteudo_tag"], data["tag_associada"])
+    if r == 200:
+        return jsonify({'status': 'ok'}), 200
+    else:
+        return jsonify({'status': 'erro'}), 500
+    
+@app.route('/contentag/put', methods=['PUT'])  
+def put_conteudo_tem_tag():
+    data = request.get_json()
+    if 'id_conteudo_tag' not in data.keys() or 'tag_associada' not in data.keys():
+        return jsonify({"erro": "campos obrigatórios não informados"}), 400
+    r = ConteudoTemTag().alter_conteudo_tem_tag(data["id_conteudo_tag"], data["tag_associada"])
+    if r == 200:
+        return jsonify({'status': 'ok'}), 200
+    else:
+        return jsonify({'status': 'erro'}), 500
 
+@app.route('/contentag/get', methods=['GET'])
+def get_conteudo_tem_tag(): #GET COMPLETO
+    r = ConteudoTemTag().get_conteudo_tem_tag()
+    if r == None:
+        return jsonify({"erro": "não há relacionamentos na base de dados"})
+    if r == 500:
+        return jsonify({"status": 'erro'}), 500
+    else:
+        rels = []
+        for x in r:
+            rel = {"id_conteudo_tag": x[0], "tag_associada": x[1]}
+            rels.append(rel)
+        return jsonify({"relacionamentos": rels})
+
+@app.route('/contentag/delete', methods=['DELETE'])
+def delete_conteudo_tem_tag():
+    data = request.get_json()
+    if 'id_conteudo_tag' not in data.keys() or 'tag_associada' not in data.keys():
+        return jsonify({"erro": "campos obrigatórios não informados"}), 400
+    r = ConteudoTemTag().delete_conteudo_tem_tag(data["id_conteudo_tag"], data["tag_associada"])
+    if r == 200:
+        return jsonify({'status': 'ok'}), 200
+    else:
+        return jsonify({'status': 'erro'}), 500
+    
 if __name__ == '__main__':
     app.run(debug=True)
